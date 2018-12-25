@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"os"
 
 	"golang.org/x/crypto/acme/autocert"
 )
@@ -26,12 +25,12 @@ func main() {
 
 	http.HandleFunc("/", index)
 
-	if os.Getenv("HELLOWORLD_SERVER_ENV") == "PROD" {
-		go http.ListenAndServe(":http", certManager.HTTPHandler(nil))
-		log.Fatal(server.ListenAndServeTLS("", ""))
-	} else {
-		http.ListenAndServe(":http", nil)
-	}
+	//if os.Getenv("HELLOWORLD_SERVER_ENV") == "PROD" {
+	go http.ListenAndServe(":http", certManager.HTTPHandler(nil))
+	log.Fatal(server.ListenAndServeTLS("", ""))
+	//} else {
+	//	http.ListenAndServe(":http", nil)
+	//}
 }
 
 func index(w http.ResponseWriter, r *http.Request) {
