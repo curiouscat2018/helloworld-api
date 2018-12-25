@@ -1,0 +1,11 @@
+[Unit]
+Description=Go HelloWorld Server
+
+[Service]
+ExecStart=/root/helloworld/main.out
+User=root
+Group=root
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
