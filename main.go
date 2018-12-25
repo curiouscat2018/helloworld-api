@@ -4,16 +4,27 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+
+	"golang.org/x/crypto/acme/autocert"
 )
 
 func main() {
-	log.Println("Go server started.")
-	http.HandleFunc("/", index)
-	go func() {
-		log.Fatalln(http.ListenAndServe(":80", nil))
-	}()
+	// certManager := autocert.Manager{
+	// 	Prompt:     autocert.AcceptTOS,
+	// 	HostPolicy: autocert.HostWhitelist("wwww.curiouscat.one"), //Your domain here
+	// 	Cache:      autocert.DirCache("certs"),                    //Folder for storing certificates
+	// }
 
-	log.Fatalln(http.ListenAndServeTLS(":443", "./cert.pem", "./key.pem", nil))
+	// server := &http.Server{
+	// 	Addr: ":https",
+	// 	TLSConfig: &tls.Config{
+	// 		GetCertificate: certManager.GetCertificate,
+	// 	},
+	// }
+
+	http.HandleFunc("/", index)
+	//log.Fatal(server.ListenAndServeTLS("", "")) //Key and cert are coming from Let's Encrypt
+	log.Fatal(http.Serve(autocert.NewListener("www.curiouscat.one"), nil))
 }
 
 func index(w http.ResponseWriter, r *http.Request) {
