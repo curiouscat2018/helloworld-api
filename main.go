@@ -12,7 +12,7 @@ import (
 func main() {
 	certManager := autocert.Manager{
 		Prompt:     autocert.AcceptTOS,
-		HostPolicy: autocert.HostWhitelist("wwww.curiouscat.one", "curiouscat.one"),
+		HostPolicy: autocert.HostWhitelist("curiouscat.one"),
 		Cache:      autocert.DirCache("./certs"),
 	}
 
