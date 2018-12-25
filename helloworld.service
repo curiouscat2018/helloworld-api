@@ -7,6 +7,7 @@ ExecStart=/root/helloworld/main.out
 User=root
 Group=root
 Restart=always
+Environment="HELLOWORLD_SERVER_ENV=PROD"
 
 [Install]
 WantedBy=multi-user.target
