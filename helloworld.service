@@ -2,6 +2,7 @@
 Description=Go HelloWorld Server
 
 [Service]
+WorkingDirectory=/root/helloworld/
 ExecStart=/root/helloworld/main.out
 User=root
 Group=root
