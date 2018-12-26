@@ -1,0 +1,13 @@
+[Unit]
+Description=helloworld-api
+
+[Service]
+Environment="HELLOWORLD_API_ENV=PROD"
+WorkingDirectory=/root/helloworld-api/
+ExecStart=/root/helloworld-server/main.out
+User=root
+Group=root
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
