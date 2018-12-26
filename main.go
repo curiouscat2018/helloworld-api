@@ -11,7 +11,6 @@ import (
 )
 
 const host = "api.curiouscat.one"
-const port = ":4431"
 
 type apiResponse struct {
 	Data string `json:"data"`
@@ -25,7 +24,7 @@ func main() {
 	}
 
 	server := &http.Server{
-		Addr: port,
+		Addr: ":https",
 		TLSConfig: &tls.Config{
 			GetCertificate: certManager.GetCertificate,
 		},
@@ -35,10 +34,10 @@ func main() {
 
 	log.Println("start helloworld-api")
 	if os.Getenv("HELLOWORLD_API_ENV") == "PROD" {
-		go http.ListenAndServe(port, certManager.HTTPHandler(nil))
+		go http.ListenAndServe(":http", certManager.HTTPHandler(nil))
 		log.Fatalln(server.ListenAndServeTLS("", ""))
 	} else {
-		log.Fatalln(http.ListenAndServe(port, nil))
+		log.Fatalln(http.ListenAndServe(":http", nil))
 	}
 }
 
