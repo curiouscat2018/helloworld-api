@@ -10,6 +10,9 @@ import (
 	"golang.org/x/crypto/acme/autocert"
 )
 
+const host = "api.curiouscat.one"
+const port = ":4431"
+
 type apiResponse struct {
 	Data string `json:"data"`
 }
@@ -17,12 +20,12 @@ type apiResponse struct {
 func main() {
 	certManager := autocert.Manager{
 		Prompt:     autocert.AcceptTOS,
-		HostPolicy: autocert.HostWhitelist("www.curiouscat.one"),
+		HostPolicy: autocert.HostWhitelist(host),
 		Cache:      autocert.DirCache("./certs"),
 	}
 
 	server := &http.Server{
-		Addr: ":https",
+		Addr: port,
 		TLSConfig: &tls.Config{
 			GetCertificate: certManager.GetCertificate,
 		},
@@ -32,10 +35,10 @@ func main() {
 
 	log.Println("start helloworld-api")
 	if os.Getenv("HELLOWORLD_API_ENV") == "PROD" {
-		go http.ListenAndServe(":http", certManager.HTTPHandler(nil))
+		go http.ListenAndServe(port, certManager.HTTPHandler(nil))
 		log.Fatalln(server.ListenAndServeTLS("", ""))
 	} else {
-		log.Fatalln(http.ListenAndServe(":http", nil))
+		log.Fatalln(http.ListenAndServe(port, nil))
 	}
 }
 
