@@ -55,7 +55,7 @@ func main() {
 	certManager := autocert.Manager{
 		Prompt:     autocert.AcceptTOS,
 		HostPolicy: autocert.HostWhitelist(host),
-		Cache:      autocert.DirCache("/home/expvm1/helloworld-api/certs"),
+		Cache:      autocert.DirCache("./certs"),
 	}
 
 	server := &http.Server{
@@ -73,7 +73,7 @@ func main() {
 		log.Fatalln(http.ListenAndServe(":http", nil))
 	} else {
 		log.Println("start listening prod helloworld-api")
-		go log.Fatalln(http.ListenAndServe(":http", certManager.HTTPHandler(nil)))
+		go http.ListenAndServe(":http", certManager.HTTPHandler(nil))
 		log.Fatalln(server.ListenAndServeTLS("", ""))
 	}
 }
