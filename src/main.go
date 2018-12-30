@@ -76,7 +76,7 @@ func main() {
 	}
 }
 
-func index(w http.ResponseWriter, r *http.Request) {
+func index(w http.ResponseWriter, _ *http.Request) {
 	entry, err := getDBntry()
 	if err != nil {
 		log.Println(err)
