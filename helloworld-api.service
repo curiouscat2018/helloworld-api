@@ -4,7 +4,7 @@ Description=helloworld-api
 [Service]
 Environment="HELLOWORLD_API_ENV=PROD"
 WorkingDirectory=/home/expvm1/helloworld-api/
-ExecStart=/home/expvm1/helloworld-api/main.out
+ExecStart=/home/expvm1/go/bin/helloworld-api
 User=root
 Group=root
 Restart=always

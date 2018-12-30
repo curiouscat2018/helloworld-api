@@ -67,10 +67,12 @@ func main() {
 
 	http.HandleFunc("/", index)
 
-	log.Println("start listening helloworld-api")
+
 	if config.isMockEnv() {
+		log.Println("start listening mock helloworld-api")
 		log.Fatalln(http.ListenAndServe(":http", nil))
 	} else {
+		log.Println("start listening prod helloworld-api")
 		go log.Fatalln(http.ListenAndServe(":http", certManager.HTTPHandler(nil)))
 		log.Fatalln(server.ListenAndServeTLS("", ""))
 	}
