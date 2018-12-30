@@ -10,3 +10,7 @@ var config configuration
 func (c configuration) isMockEnv() bool {
 	return os.Getenv("HELLOWORLD_API_ENV") != "PROD"
 }
+
+func (c configuration) getHomeDir() string {
+	return os.Getenv("HOME")
+}

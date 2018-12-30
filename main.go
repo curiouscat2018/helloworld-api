@@ -55,7 +55,7 @@ func main() {
 	certManager := autocert.Manager{
 		Prompt:     autocert.AcceptTOS,
 		HostPolicy: autocert.HostWhitelist(host),
-		Cache:      autocert.DirCache("./certs"),
+		Cache:      autocert.DirCache("/home/expvm1/helloworld-api/certs"),
 	}
 
 	server := &http.Server{
@@ -67,7 +67,7 @@ func main() {
 
 	http.HandleFunc("/", index)
 
-
+	log.Printf("home: %v", config.getHomeDir())
 	if config.isMockEnv() {
 		log.Println("start listening mock helloworld-api")
 		log.Fatalln(http.ListenAndServe(":http", nil))
