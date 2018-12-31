@@ -4,22 +4,18 @@ import (
 	"context"
 	"crypto/tls"
 	"encoding/json"
-	"fmt"
 	"github.com/astaxie/beego/cache"
 	"github.com/mongodb/mongo-go-driver/bson"
 	"github.com/mongodb/mongo-go-driver/mongo"
+	"golang.org/x/crypto/acme/autocert"
 	"log"
 	"net/http"
 	"strconv"
-	"time"
-
-	"golang.org/x/crypto/acme/autocert"
 )
 
 const host = "api.curiouscat.one"
-const testSecretUrl = "https://helloworld-vault.vault.azure.net/secrets/testsecret/e3246fd47fa74a638e99e4c4afe97006"
-const cacheGCSec = 3600
-const cachePersistTime = time.Hour
+const testSecretUrl = "https://helloworld-vault.vault.azure.net/secrets/testsecret/e3246fd47fa74a638e99e4c4afe97006?api-version=7.0"
+
 
 type dbEntry struct {
 	Greeting     string
@@ -36,8 +32,8 @@ var inmemoryCache cache.Cache
 
 func init() {
 	// TODO: check in files and reset connection string
-	azureUrl := "mongodb://helloworld-db:mMIXPtgqLRa8FWhIzmbuKWTNvSyL2kmdbdewIton3iFp9lqimEhofbMTlQNcNNiSdtmZBfiVpGau5OVLHqPLNg==@helloworld-db.documents.azure.com:10255/?ssl=true&replicaSet=globaldb"
-	client, err := mongo.Connect(context.TODO(), azureUrl)
+	url := "mongodb://helloworld-db:mMIXPtgqLRa8FWhIzmbuKWTNvSyL2kmdbdewIton3iFp9lqimEhofbMTlQNcNNiSdtmZBfiVpGau5OVLHqPLNg==@helloworld-db.documents.azure.com:10255/?ssl=true&replicaSet=globaldb"
+	client, err := mongo.Connect(context.TODO(), url)
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -79,7 +75,7 @@ func main() {
 }
 
 func index(w http.ResponseWriter, _ *http.Request) {
-	entry, err := getDBntry()
+	entry, err := getDBEntry()
 	if err != nil {
 		log.Println(err)
 		reportInternalServerError(w, "failed to get dbEntry", err)
@@ -91,7 +87,7 @@ func index(w http.ResponseWriter, _ *http.Request) {
 		functor = getSecretLocal
 	}
 
-	secret, err := getSecretFromCache(testSecretUrl, functor)
+	secret, err := getRESTDataFromCache(testSecretUrl, functor)
 	if err != nil {
 		reportInternalServerError(w, "failed to get testSecret", err)
 		return
@@ -108,7 +104,7 @@ func index(w http.ResponseWriter, _ *http.Request) {
 	}
 }
 
-func getDBntry() (*dbEntry, error) {
+func getDBEntry() (*dbEntry, error) {
 	filter := bson.M{"greeting": "helloworld!"}
 	update := bson.M{"$inc": bson.M{"requestcount": 1}}
 
@@ -127,48 +123,6 @@ func getDBntry() (*dbEntry, error) {
 		log.Printf("inserted dbEntry %v\n", result.InsertedID)
 	}
 	return &entry, nil
-}
-
-func getSecretFromCache(url string, functor func(string) (string, error)) (string, error) {
-	if inmemoryCache.IsExist(url) {
-		res, ok := inmemoryCache.Get(url).(string)
-		if !ok {
-			return "", fmt.Errorf("not able to cast value to string")
-		}
-		return res, nil
-	}
-
-	secert, err := functor(url)
-	if err != nil {
-		return "", err
-	}
-
-	if err := inmemoryCache.Put(url, secert, cachePersistTime); err != nil {
-		return "", nil
-	}
-
-	return secert, nil
-}
-
-func getSecret(url string) (string, error) {
-	response, err := http.Get(url)
-	if err != nil {
-		return "", err
-	}
-
-	if response.StatusCode != http.StatusOK {
-		return "", fmt.Errorf("invalid http status: %v", response.StatusCode)
-	}
-
-	responseJSON := struct {
-		Value string
-	}{}
-
-	if err := json.NewDecoder(response.Body).Decode(&responseJSON); err != nil {
-		return "", err
-	}
-
-	return responseJSON.Value, nil
 }
 
 func reportInternalServerError(w http.ResponseWriter, msg string, err error) {
