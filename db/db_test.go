@@ -1,10 +1,11 @@
 package db
 
 import (
-	"../config"
 	"flag"
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/curiouscat2018/helloworld-api/config"
+	"github.com/stretchr/testify/assert"
 )
 
 var integrationTest = flag.Bool("int", false, "run integration test")

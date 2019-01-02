@@ -2,9 +2,10 @@ package cache
 
 import (
 	"fmt"
-	"github.com/astaxie/beego/cache"
 	"strconv"
 	"time"
+
+	"github.com/astaxie/beego/cache"
 )
 
 const CacheGCSec = 3600

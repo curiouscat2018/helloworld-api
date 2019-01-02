@@ -1,15 +1,16 @@
 package main
 
 import (
-	"./cache"
-	. "./config"
-	"./db"
-	"./vault"
 	"crypto/tls"
 	"encoding/json"
-	"golang.org/x/crypto/acme/autocert"
 	"log"
 	"net/http"
+
+	"github.com/curiouscat2018/helloworld-api/cache"
+	. "github.com/curiouscat2018/helloworld-api/config"
+	"github.com/curiouscat2018/helloworld-api/db"
+	"github.com/curiouscat2018/helloworld-api/vault"
+	"golang.org/x/crypto/acme/autocert"
 )
 
 var myCache *cache.Cache
