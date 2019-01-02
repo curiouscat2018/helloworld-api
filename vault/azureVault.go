@@ -1,4 +1,4 @@
-package main
+package vault
 
 import (
 	"encoding/json"
@@ -8,19 +8,26 @@ import (
 	"net/http"
 )
 
-func getSecret(url string) (string, error) {
+type azureVault struct {
+}
+
+func NewAzureVault() Vault {
+	return azureVault{}
+}
+
+func (v azureVault) GetSecret(url string) (string, error) {
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return "", err
 	}
 
-	accessToken, err := getKeyVaultAccessToken()
+	accessToken, err := v.getKeyVaultAccessToken()
 	if err != nil {
 		return "", err
 	}
 
 	client := http.Client{}
-	req.Header.Set("Authorization", "Bearer " + accessToken)
+	req.Header.Set("Authorization", "Bearer "+accessToken)
 	response, err := client.Do(req)
 	if err != nil {
 		return "", err
@@ -43,7 +50,7 @@ func getSecret(url string) (string, error) {
 	return responseJSON.Value, nil
 }
 
-func getKeyVaultAccessToken() (string, error) {
+func (azureVault) getKeyVaultAccessToken() (string, error) {
 	req, err := http.NewRequest("GET", "http://169.254.169.254/metadata/identity/oauth2/token?api-version=2018-02-01&resource=https%3A%2F%2Fvault.azure.net", nil)
 	if err != nil {
 		return "", err
@@ -73,4 +80,3 @@ func getKeyVaultAccessToken() (string, error) {
 	log.Println("successfully get access_token")
 	return responseJSON.Access_token, nil
 }
-
