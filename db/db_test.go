@@ -1,14 +1,11 @@
 package db
 
 import (
-	"flag"
 	"testing"
 
 	"github.com/curiouscat2018/helloworld-api/config"
 	"github.com/stretchr/testify/assert"
 )
-
-var integrationTest = flag.Bool("int", false, "run integration test")
 
 func TestMockDB_GetDBEntry(t *testing.T) {
 	testDB, _ := NewMockDB()
@@ -22,7 +19,7 @@ func TestMockDB_GetDBEntry(t *testing.T) {
 }
 
 func TestAzureDB_GetDBEntry(t *testing.T) {
-	if !*integrationTest {
+	if testing.Short() {
 		return
 	}
 
