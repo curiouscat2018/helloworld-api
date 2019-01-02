@@ -2,9 +2,10 @@ package db
 
 import (
 	"context"
+	"log"
+
 	"github.com/mongodb/mongo-go-driver/bson"
 	"github.com/mongodb/mongo-go-driver/mongo"
-	"log"
 )
 
 type azureDB struct {

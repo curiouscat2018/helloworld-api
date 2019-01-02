@@ -1,12 +1,12 @@
 package vault
 
 import (
-	"github.com/stretchr/testify/assert"
 	"log"
 	"testing"
-)
 
-const demoSecretUrl = "https://helloworld-vault.vault.azure.net/secrets/demosecret/ff32ea6957d04e529407cc839eef2cf8?api-version=7.0"
+	"github.com/curiouscat2018/helloworld-api/config"
+	"github.com/stretchr/testify/assert"
+)
 
 func TestMockVault_GetSecret(t *testing.T) {
 	vault := NewMockVault()
@@ -22,7 +22,7 @@ func TestAzureVault_GetSecret(t *testing.T) {
 	}
 
 	vault := NewAzureVault()
-	secret, err := vault.GetSecret(demoSecretUrl)
+	secret, err := vault.GetSecret(config.DemosecretVaultIdentifier)
 	assert.Nil(t, err)
 	assert.NotEmpty(t, secret)
 	log.Printf("secret value: %v", secret)

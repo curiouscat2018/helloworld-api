@@ -7,7 +7,7 @@ import (
 	"net/http"
 
 	"github.com/curiouscat2018/helloworld-api/cache"
-	. "github.com/curiouscat2018/helloworld-api/config"
+	"github.com/curiouscat2018/helloworld-api/config"
 	"github.com/curiouscat2018/helloworld-api/db"
 	"github.com/curiouscat2018/helloworld-api/vault"
 	"golang.org/x/crypto/acme/autocert"
@@ -19,9 +19,9 @@ var myDB db.DB
 
 func main() {
 	http.HandleFunc("/", index)
-	log.Printf("start listening helloworld-api: isMockEnv: %v", Config.IsMockEnv())
+	log.Printf("start listening helloworld-api: isMockEnv: %v", config.Config.IsMockEnv())
 
-	if Config.IsMockEnv() {
+	if config.Config.IsMockEnv() {
 		myCache, myVault, myDB = prepareMockEnv()
 		log.Fatalln(http.ListenAndServe(":http", nil))
 	} else {
@@ -33,42 +33,47 @@ func main() {
 }
 
 func prepareProdEnv() (c *cache.Cache, v vault.Vault, d db.DB) {
-	d, err := db.NewAzureDB(DBURL)
+	log.Println("preparing in-memory cache")
+	c, err := cache.NewCache(cache.CacheGCSec, cache.CachePersistTime)
 	if err != nil {
-		log.Fatalln(err)
+		log.Fatal(err)
 	}
-	log.Println("prepare Azure DB")
 
-	c, err = cache.NewCache(cache.CacheGCSec, cache.CachePersistTime)
-	if err != nil {
-		log.Fatalln(err)
-	}
-	log.Println("prepare in-memory cache")
-
+	log.Println("preparing Azure vault")
 	v = vault.NewAzureVault()
-	log.Println("prepare Azure vault")
+
+	log.Println("preparing Azure DB")
+	dbURL, err := v.GetSecret(config.DBURLVaultIdentifier)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	d, err = db.NewAzureDB(dbURL)
+	if err != nil {
+		log.Fatal(err)
+	}
 	return
 }
 
 func prepareMockEnv() (c *cache.Cache, v vault.Vault, d db.DB) {
-	d, err := db.NewMockDB()
-	log.Println("prepare mock DB")
-
-	c, err = cache.NewCache(cache.CacheGCSec, cache.CachePersistTime)
+	log.Println("preparing in-memory cache")
+	c, err := cache.NewCache(cache.CacheGCSec, cache.CachePersistTime)
 	if err != nil {
-		log.Fatalln(err)
+		log.Fatal(err)
 	}
-	log.Println("prepare in-memory cache")
 
+	log.Println("preparing mock vault")
 	v = vault.NewMockVault()
-	log.Println("prepare mock vault")
+
+	log.Println("preparing mock DB")
+	d, err = db.NewMockDB()
 	return
 }
 
 func prepareTLS() (autocert.Manager, *http.Server) {
 	certManager := autocert.Manager{
 		Prompt:     autocert.AcceptTOS,
-		HostPolicy: autocert.HostWhitelist(Host),
+		HostPolicy: autocert.HostWhitelist(config.Host),
 		Cache:      autocert.DirCache("./certs"),
 	}
 
@@ -89,7 +94,7 @@ func index(w http.ResponseWriter, _ *http.Request) {
 		return
 	}
 
-	secret, _, err := myCache.GetRESTDataFromCache(DemoSecretUrl, myVault.GetSecret)
+	secret, _, err := myCache.GetRESTDataFromCache(config.DemosecretVaultIdentifier, myVault.GetSecret)
 	if err != nil {
 		reportInternalServerError(w, "failed to get demosecret", err)
 		return

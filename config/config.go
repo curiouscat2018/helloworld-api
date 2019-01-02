@@ -3,12 +3,10 @@ package config
 import "os"
 
 const Host = "api.curiouscat.one"
-const DBURL = "mongodb://helloworld-db:mMIXPtgqLRa8FWhIzmbuKWTNvSyL2kmdbdewIton3iFp9lqimEhofbMTlQNcNNiSdtmZBfiVpGau5OVLHqPLNg==@helloworld-db.documents.azure.com:10255/?ssl=true&replicaSet=globaldb"
-const TestSecretUrl = "https://helloworld-vault.vault.azure.net/secrets/testsecret/e3246fd47fa74a638e99e4c4afe97006?api-version=7.0"
-const DemoSecretUrl = "https://helloworld-vault.vault.azure.net/secrets/demosecret/ff32ea6957d04e529407cc839eef2cf8?api-version=7.0"
+const DemosecretVaultIdentifier = "https://helloworld-vault.vault.azure.net/secrets/demosecret/ff32ea6957d04e529407cc839eef2cf8?api-version=7.0"
+const DBURLVaultIdentifier = "https://helloworld-vault.vault.azure.net/secrets/helloworld-db-connection-str/0e26fb007a3c49caabfad16be2e6713e?api-version=7.0"
 
 type configuration struct {
-	i int
 }
 
 var Config configuration

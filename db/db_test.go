@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/curiouscat2018/helloworld-api/config"
+	"github.com/curiouscat2018/helloworld-api/vault"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -23,7 +24,11 @@ func TestAzureDB_GetDBEntry(t *testing.T) {
 		return
 	}
 
-	testDB, err := NewAzureDB(config.DBURL)
+	v := vault.NewAzureVault()
+	dbURL, err := v.GetSecret(config.DBURLVaultIdentifier)
+	assert.Nil(t, err)
+
+	testDB, err := NewAzureDB(dbURL)
 	assert.Nil(t, err)
 	entry, err := testDB.GetDBEntry()
 	assert.Nil(t, err)
