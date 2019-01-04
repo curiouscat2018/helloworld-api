@@ -1,14 +1,12 @@
 package main
 
 import (
-	"crypto/tls"
 	"encoding/json"
 	"log"
 	"net/http"
 
 	"github.com/curiouscat2018/helloworld-api/config"
 	"github.com/curiouscat2018/helloworld-api/database"
-	"golang.org/x/crypto/acme/autocert"
 )
 
 var myDB database.Database
@@ -19,13 +17,10 @@ func main() {
 
 	if config.Config.IsMockEnv {
 		prepareMockEnv(&myDB)
-		log.Fatalln(http.ListenAndServe(":http", nil))
 	} else {
 		prepareProdEnv(&myDB)
-		certManager, server := prepareTLS()
-		go http.ListenAndServe(":http", certManager.HTTPHandler(nil))
-		log.Fatalln(server.ListenAndServeTLS("", ""))
 	}
+	log.Fatalln(http.ListenAndServe(":http", nil))
 }
 
 func prepareProdEnv(db *database.Database) {
@@ -41,22 +36,6 @@ func prepareMockEnv(db *database.Database) {
 	log.Println("preparing mock Database")
 	tempDB := database.NewMockDatabase()
 	*db = tempDB
-}
-
-func prepareTLS() (autocert.Manager, *http.Server) {
-	certManager := autocert.Manager{
-		Prompt:     autocert.AcceptTOS,
-		HostPolicy: autocert.HostWhitelist(config.Config.Host),
-		Cache:      autocert.DirCache(config.Config.TLSCertPath),
-	}
-
-	server := &http.Server{
-		Addr: ":https",
-		TLSConfig: &tls.Config{
-			GetCertificate: certManager.GetCertificate,
-		},
-	}
-	return certManager, server
 }
 
 func index(w http.ResponseWriter, _ *http.Request) {

@@ -7,10 +7,8 @@ import (
 )
 
 type config struct {
-	Host        string
 	DB_URL      string
 	IsMockEnv   bool
-	TLSCertPath string
 }
 
 var Config config

@@ -1,6 +1,4 @@
 {
-  "Host": "api.curiouscat.one",
   "DB_URL": "",
-  "IsMockEnv": true,
-  "TLSCertPath": "./certs"
+  "IsMockEnv": true
 }
