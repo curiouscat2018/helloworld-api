@@ -2,11 +2,10 @@ package main
 
 import (
 	"encoding/json"
-	"log"
-	"net/http"
-
 	"github.com/curiouscat2018/helloworld-api/config"
 	"github.com/curiouscat2018/helloworld-api/database"
+	"log"
+	"net/http"
 )
 
 var myDB database.Database
@@ -48,10 +47,10 @@ func index(w http.ResponseWriter, _ *http.Request) {
 
 	response := struct {
 		database.Entry
-		HostName string
+		Hostname string
 	}{
 		Entry:    *entry,
-		HostName: config.Config.HostName(),
+		Hostname: config.Config.HostName(),
 	}
 
 	w.Header().Set("Content-Type", "application/json")
