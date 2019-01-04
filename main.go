@@ -77,6 +77,7 @@ func index(w http.ResponseWriter, _ *http.Request) {
 	if err := json.NewEncoder(w).Encode(&response); err != nil {
 		reportInternalServerError(w, "failed to encode JSON", err)
 	}
+	log.Print("handle index success")
 }
 
 func reportInternalServerError(w http.ResponseWriter, msg string, err error) {
