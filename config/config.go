@@ -23,3 +23,12 @@ func init() {
 		log.Fatal(err)
 	}
 }
+
+func (c config) HostName() string {
+	res := os.Getenv("HOST")
+	if res == "" {
+		res = "NA"
+	}
+
+	return res
+}

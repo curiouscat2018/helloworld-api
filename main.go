@@ -48,8 +48,10 @@ func index(w http.ResponseWriter, _ *http.Request) {
 
 	response := struct {
 		database.Entry
+		HostName string
 	}{
-		*entry,
+		Entry:    *entry,
+		HostName: config.Config.HostName(),
 	}
 
 	w.Header().Set("Content-Type", "application/json")
