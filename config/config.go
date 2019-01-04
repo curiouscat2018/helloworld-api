@@ -25,7 +25,7 @@ func init() {
 }
 
 func (c config) HostName() string {
-	res := os.Getenv("HOST")
+	res := os.Getenv("HOSTNAME")
 	if res == "" {
 		res = "NA"
 	}
