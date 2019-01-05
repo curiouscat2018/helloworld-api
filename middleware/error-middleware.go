@@ -15,6 +15,6 @@ func  ErrorMiddleware() gin.HandlerFunc {
 
 		c.JSON(c.Writer.Status(),  gin.H{
 			"request-id": c.GetString("request-id"),
-			"err": c.Errors.String()})
+			"error": c.Errors.String()})
 	}
 }

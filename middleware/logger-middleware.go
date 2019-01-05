@@ -41,7 +41,7 @@ func LoggerMiddleware() gin.HandlerFunc {
 			Str("path", path).
 			Str("ip", c.ClientIP()).
 			Dur("latency", latency).
-			Str("err", err).
+			Str("error", err).
 			//Str("user-agent", c.Request.UserAgent()).
 			Logger()
 
