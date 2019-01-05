@@ -1,7 +1,6 @@
 package middleware
 
 import (
-	"github.com/curiouscat2018/helloworld-api/config"
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog/log"
 	"net/http"
@@ -35,7 +34,7 @@ func LoggerMiddleware() gin.HandlerFunc {
 		subLogger := log.With().
 			Str("tag", "per-request-trace").
 			Str("request-id", c.GetString("request-id")).
-			Str("hostname", config.Config.HostName()).
+			//Str("hostname", config.Config.HostName()).
 			Int("status", c.Writer.Status()).
 			Str("method", c.Request.Method).
 			Str("protocol", c.Request.Proto).
