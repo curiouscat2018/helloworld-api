@@ -41,17 +41,16 @@ func LoggerMiddleware() gin.HandlerFunc {
 			Str("path", path).
 			Str("ip", c.ClientIP()).
 			Dur("latency", latency).
-			Str("error", err).
 			//Str("user-agent", c.Request.UserAgent()).
 			Logger()
 
 		switch {
 		case c.Writer.Status() >= http.StatusBadRequest && c.Writer.Status() < http.StatusInternalServerError:
-			subLogger.Warn().Msg("")
+			subLogger.Warn().Msg(err)
 		case c.Writer.Status() >= http.StatusInternalServerError:
-			subLogger.Error().Msg("")
+			subLogger.Error().Msg(err)
 		default:
-			subLogger.Info().Msg("")
+			subLogger.Info().Msg(err)
 		}
 	}
 }

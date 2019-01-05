@@ -27,14 +27,15 @@ func (db azureDatabase) GetEntry(c *gin.Context) (*Entry, error) {
 	filter := bson.M{"greeting": "helloworld!"}
 	update := bson.M{"$inc": bson.M{"request_count": 1}}
 
-	result := db.collection.FindOneAndUpdate(context.TODO(), filter, update)
+	result := db.collection.FindOneAndUpdate(c, filter, update)
 	entry := Entry{}
+
 	if err := result.Decode(&entry); err != nil {
 		common.TraceWarn(c).Err(err).Msg("db record not found or corrupted")
 
 		entry.Greeting = "helloworld!"
 		entry.RequestCount = 1
-		_, err := db.collection.InsertOne(context.TODO(), &entry)
+		_, err := db.collection.InsertOne(c, entry)
 
 		if err != nil {
 			return nil, err
