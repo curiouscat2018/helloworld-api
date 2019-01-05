@@ -1,66 +1,83 @@
 package main
 
 import (
-	"encoding/json"
+	"github.com/curiouscat2018/helloworld-api/common"
 	"github.com/curiouscat2018/helloworld-api/config"
 	"github.com/curiouscat2018/helloworld-api/database"
-	"log"
+	"github.com/curiouscat2018/helloworld-api/middleware"
+	"github.com/gin-gonic/gin"
+	"github.com/pkg/errors"
 	"net/http"
 )
 
 var myDB database.Database
 
 func main() {
-	http.HandleFunc("/", index)
-	log.Printf("start listening helloworld-api: isMockEnv: %v", config.Config.IsMockEnv)
+	r := gin.New()
+	r.Use(middleware.ContextMiddleware())
+	r.Use(middleware.LoggerMiddleware())
+	r.Use(middleware.HeaderMiddleware())
+	r.Use(middleware.ErrorMiddleware())
+	r.Use(gin.Recovery())
+
+	r.GET("/", handleIndex)
+	r.GET("/ping", handlePing)
+	r.NoRoute(handleNotFound)
 
 	if config.Config.IsMockEnv {
 		prepareMockEnv(&myDB)
 	} else {
 		prepareProdEnv(&myDB)
 	}
-	log.Fatalln(http.ListenAndServe(":http", nil))
+
+	common.TraceInfo(nil).Msgf("start listening helloworld-api: is mock env: %v", config.Config.IsMockEnv)
+	common.TraceError(nil).Err(r.Run(":http")).Msg("helloworld-api stopped")
 }
 
 func prepareProdEnv(db *database.Database) {
-	log.Println("preparing Azure Database")
+	common.TraceInfo(nil).Msg("preparing Azure Database")
 	tempDB, err := database.NewAzureDatabase(config.Config.DB_URL)
 	if err != nil {
-		log.Fatal(err)
+		common.TraceFatal(nil).Err(err).Msg("")
 	}
 	*db = tempDB
 }
 
 func prepareMockEnv(db *database.Database) {
-	log.Println("preparing mock Database")
+	common.TraceInfo(nil).Msg("preparing mock Database")
 	tempDB := database.NewMockDatabase()
 	*db = tempDB
 }
 
-func index(w http.ResponseWriter, _ *http.Request) {
+func handleNotFound(c *gin.Context) {
+	setHttpError(c, http.StatusNotFound, errors.New("page not found"))
+}
+
+func handlePing(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{
+		"message":"success",
+	})
+}
+
+func handleIndex(c *gin.Context) {
 	entry, err := myDB.GetEntry()
 	if err != nil {
-		log.Println(err)
-		reportInternalServerError(w, "failed to get database entry", err)
+		setHttpError(c, http.StatusInternalServerError, err)
 		return
 	}
 
 	response := struct {
 		database.Entry
-		Hostname string
+		Hostname string `json:"hostname"`
 	}{
 		Entry:    *entry,
 		Hostname: config.Config.HostName(),
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	if err := json.NewEncoder(w).Encode(&response); err != nil {
-		reportInternalServerError(w, "failed to encode JSON", err)
-	}
-	log.Print("handle index success")
+	c.JSON(http.StatusOK, &response)
 }
 
-func reportInternalServerError(w http.ResponseWriter, msg string, err error) {
-	log.Printf("%v: %v", msg, err)
-	http.Error(w, msg, http.StatusInternalServerError)
+func setHttpError(c *gin.Context, code int, err error) {
+	c.Status(code)
+	c.Error(err)
 }

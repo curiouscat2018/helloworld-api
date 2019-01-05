@@ -1,8 +1,8 @@
 package database
 
 type Entry struct {
-	Greeting     string
-	RequestCount int
+	Greeting     string `json:"greeting"`
+	RequestCount int `json:"request_count"`
 }
 
 type Database interface {

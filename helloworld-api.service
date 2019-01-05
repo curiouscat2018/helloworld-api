@@ -2,6 +2,7 @@
 Description=helloworld-api
 
 [Service]
+Environment="GIN_MODE=release"
 WorkingDirectory=/root
 ExecStart=/root/go/bin/helloworld-api
 User=root
