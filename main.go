@@ -1,13 +1,14 @@
 package main
 
 import (
+	"net/http"
+
 	"github.com/curiouscat2018/helloworld-api/common"
 	"github.com/curiouscat2018/helloworld-api/config"
 	"github.com/curiouscat2018/helloworld-api/database"
 	"github.com/curiouscat2018/helloworld-api/middleware"
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
-	"net/http"
 )
 
 var myDB database.Database
@@ -55,12 +56,12 @@ func handleNotFound(c *gin.Context) {
 
 func handlePing(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
-		"message":"success",
+		"message": "success",
 	})
 }
 
 func handleIndex(c *gin.Context) {
-	entry, err := myDB.GetEntry()
+	entry, err := myDB.GetEntry(c)
 	if err != nil {
 		setHttpError(c, http.StatusInternalServerError, err)
 		return

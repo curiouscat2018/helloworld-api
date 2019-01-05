@@ -1,5 +1,7 @@
 package database
 
+import "github.com/gin-gonic/gin"
+
 type mockDB struct {
 	count int
 }
@@ -10,7 +12,7 @@ func NewMockDatabase() Database {
 	return db
 }
 
-func (db *mockDB) GetEntry() (*Entry, error) {
+func (db *mockDB) GetEntry(c *gin.Context) (*Entry, error) {
 	db.count++
 	entry := Entry{
 		Greeting:     "helloworld! from mock Database",
